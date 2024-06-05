@@ -1,10 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+
+const TURNS = {
+  X: "x",
+  O: "o",
+};
+
+const Square = ({ children, updateBoard, index }) => {
+    return (
+        <div className="square">
+            {children}
+        </div>
+    )
+}
 
 function App() {
- return <h1>TA-TE-TI</h1>
+  const [board, setBoard] = useState
+  (['x', 'x', 'x', 'o', 'o', 'o', 'x', 'o', 'x']
+
+  )
+
+ return (
+    <main className="board">
+ <h1>TA-TE-TI</h1>
+ <section className="game">
+  {
+    board.map((_, index) => {
+        return (
+            <Square
+            key={index}
+            index={index}
+            >
+                {board[index]}
+            </Square>
+        )
+    })
+  }
+ </section>
+ </main>
+ )
 }
 
 export default App
