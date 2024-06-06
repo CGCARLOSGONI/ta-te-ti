@@ -5,39 +5,55 @@ const TURNS = {
   O: "o",
 };
 
-const Square = ({ children, updateBoard, index }) => {
-    return (
-        <div className="square">
-            {children}
-        </div>
-    )
-}
+const Square = ({ children, isSelected, updateBoard, index }) => {
+  const className = `square ${isSelected ? "is-selected" : ""}`;
+
+  const handelClick = () => {
+    updateBoard(index);
+  };
+
+  return (
+    <div onClick={handelClick} className={className}>
+      {children}
+    </div>
+  );
+};
 
 function App() {
-  const [board, setBoard] = useState
-  (['x', 'x', 'x', 'o', 'o', 'o', 'x', 'o', 'x']
+  const [board, setBoard] = useState(Array(9).fill(null))
 
-  )
+  const [turn, setTurn] = useState(TURNS.X)
+  const [ winner, setWinner] = useState(null)
 
- return (
+  const updateBoard = (index) => {
+    if(board[index]) return
+    const newBoard = [...board]
+    newBoard[index] = turn
+    setBoard(newBoard)
+
+    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
+    setTurn(newTurn)
+  };
+
+  return (
     <main className="board">
- <h1>TA-TE-TI</h1>
- <section className="game">
-  {
-    board.map((_, index) => {
-        return (
-            <Square
-            key={index}
-            index={index}
-            >
-                {board[index]}
+      <h1>TA-TE-TI</h1>
+      <section className="game">
+        {board.map((_, index) => {
+          return (
+            <Square key={index} index={index} updateBoard={updateBoard}>
+              {board[index]}
             </Square>
-        )
-    })
-  }
- </section>
- </main>
- )
+          );
+        })}
+      </section>
+
+      <section className="turn">
+        <Square isSelected={turn === TURNS.X}>{TURNS.X}</Square>
+        <Square isSelected={turn === TURNS.O}>{TURNS.O}</Square>
+      </section>
+    </main>
+  );
 }
 
-export default App
+export default App;
