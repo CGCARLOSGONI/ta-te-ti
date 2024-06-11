@@ -1,55 +1,59 @@
 import { useState } from "react";
 import confetti from "canvas-confetti";
-import { Square } from "./components/Square.jsx"
+import { Square } from "./components/Square.jsx";
 import { TURNS } from "./components/constants.js";
-import { checkWinnerFrom } from "./components/logic/board.js";
+import { checkWinnerFrom, checkEndGame } from "./components/logic/board.js";
 import { WinnerModal } from "./components/WinnerModal.jsx";
 
-
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null))
+  const [board, setBoard] = useState(() => {
+    const boardFromStorage = window.localStorage.getItem('board')
+    if (boardFromStorage) return JSON.parse(boardFromStorage) 
+    return Array(9).fill(null)
+  });
 
-  const [turn, setTurn] = useState(TURNS.X)
+  const [turn, setTurn] = useState(() => {
+    const turnFromStorage = window.localStorage.getItem('turn')
+    return turnFromStorage ?? TURNS.X
+  });
 
-  const [ winner, setWinner] = useState(null)
+  const [winner, setWinner] = useState(null);
 
-  
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setTurn(TURNS.X);
+    setWinner(null);
 
-    const resetGame = () => {
-        setBoard(Array(9).fill(null))
-        setTurn(TURNS.X)
-        setWinner(null)
-    }
-
-    const checkEndGame = (newBoard) => {
-        return newBoard.every((square) => square !== null)
-    }
+    window.localStorage.removeItem('board')
+    window.localStorage.removeItem('turn')
+  };
 
   const updateBoard = (index) => {
-    if(board[index] || winner) return
-    const newBoard = [...board]
-    newBoard[index] = turn
-    setBoard(newBoard)
+    if (board[index] || winner) return;
+    const newBoard = [...board];
+    newBoard[index] = turn;
+    setBoard(newBoard);
 
-    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
-    setTurn(newTurn)
+    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
+    setTurn(newTurn);
 
-    const newWinner = checkWinnerFrom(newBoard)
+    window.localStorage.setItem('board', JSON.stringify(newBoard))
+    window.localStorage.setItem('turn', newTurn)
+
+    const newWinner = checkWinnerFrom(newBoard);
     if (newWinner) {
-        confetti()
-        setWinner(newWinner)
+      confetti();
+      setWinner(newWinner);
     } else if (checkEndGame(newBoard)) {
-        setWinner(false)
+      setWinner(false);
     }
-  }
+  };
 
   return (
     <main className="board">
       <h1>TA-TE-TI</h1>
 
-      <button onClick={resetGame}>
-        Reset del juego
-      </button> 
+      <button onClick={resetGame}>Reset del juego</button>
 
       <section className="game">
         {board.map((square, index) => {
@@ -66,8 +70,7 @@ function App() {
         <Square isSelected={turn === TURNS.O}>{TURNS.O}</Square>
       </section>
 
-      <WinnerModal resetGame={resetGame} winner={winner}/>
-
+      <WinnerModal resetGame={resetGame} winner={winner} />
     </main>
   );
 }
