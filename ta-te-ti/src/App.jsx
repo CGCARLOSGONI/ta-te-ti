@@ -4,7 +4,7 @@ import { Square } from "./components/Square.jsx";
 import { TURNS } from "./components/constants.js";
 import { checkWinnerFrom, checkEndGame } from "./components/logic/board.js";
 import { WinnerModal } from "./components/WinnerModal.jsx";
-
+import { saveGameToStorage, resetGameStorage } from "./components/logic/storage/index.js";
 
 function App() {
   const [board, setBoard] = useState(() => {
@@ -24,7 +24,8 @@ function App() {
     setBoard(Array(9).fill(null));
     setTurn(TURNS.X);
     setWinner(null);
-
+    
+    resetGameStorage()
     
   };
 
@@ -36,8 +37,11 @@ function App() {
 
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
     setTurn(newTurn);
-
     
+    saveGameToStorage({
+      board: newBoard,
+      turn: newTurn
+    })
 
     const newWinner = checkWinnerFrom(newBoard);
     if (newWinner) {
